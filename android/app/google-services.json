@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "708640333634",
+    "project_id": "babymetal-e3fcd",
+    "storage_bucket": "babymetal-e3fcd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708640333634:android:7b183e5c88743f7a6472db",
+        "android_client_info": {
+          "package_name": "com.example.babymetal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxKzOrebkieo4R7gNYMzsWfuwuFfPCFes"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
