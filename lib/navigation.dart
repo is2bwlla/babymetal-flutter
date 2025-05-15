@@ -1,3 +1,7 @@
+import 'package:babymetal/cadastro_cartao.dart';
+import 'package:babymetal/details.dart';
+import 'package:babymetal/historico.dart';
+import 'package:babymetal/ingressos.dart';
 import 'package:babymetal/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,7 +23,8 @@ class _NavAppState extends State<NavApp> {
   );
 
   static List<Widget> _widgetOptions = <Widget> [    
-    HomeScreen(),
+    IngressoPage(),
+    CartaoHistoryScreen(),
   ];
 
   void showItemTrap(int index) {
@@ -38,9 +43,18 @@ class _NavAppState extends State<NavApp> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home),
-          label: "Home",
-          backgroundColor: Colors.black)
-        ]
+            label: "Home",
+            backgroundColor: Colors.black
+          ),
+
+          BottomNavigationBarItem(icon: Icon(Icons.history),
+            label: "History",
+            backgroundColor: Colors.black
+          )
+        ],
+        currentIndex: selectIndex,
+        selectedItemColor: Colors.red,
+        onTap: showItemTrap,
       ),
     );
   }

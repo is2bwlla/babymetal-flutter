@@ -16,16 +16,27 @@ class _PostCartaoState extends State<PostCartao> {
   final TextEditingController cvvController = TextEditingController();
 
   Future<void> postCartao() async {
-    final String nome = nomeController.text;
-    final String numero = numeroController.text; // Mudado para String
-    final int mes = int.tryParse(mesController.text) ?? 0;
-    final int ano = int.tryParse(anoController.text) ?? 0;
-    final int cvv = int.tryParse(cvvController.text) ?? 0;
+    final String nome = nomeController.text.trim();
+    final String numero = numeroController.text.trim();
+    final String mesStr = mesController.text.trim();
+    final String anoStr = anoController.text.trim();
+    final String cvvStr = cvvController.text.trim();
+
+    if (nome.isEmpty || numero.isEmpty || mesStr.isEmpty || anoStr.isEmpty || cvvStr.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Por favor, preencha todos os campos!")),
+      );
+      return;
+    }
+
+    final int mes = int.tryParse(mesStr) ?? 0;
+    final int ano = int.tryParse(anoStr) ?? 0;
+    final int cvv = int.tryParse(cvvStr) ?? 0;
 
     try {
       await FirebaseFirestore.instance.collection('ingresso').add({
         'nome': nome,
-        'numero': numero, // Mudado para String
+        'numero': numero,
         'mes': mes,
         'ano': ano,
         'cvv': cvv,
@@ -41,9 +52,10 @@ class _PostCartaoState extends State<PostCartao> {
       anoController.clear();
       cvvController.clear();
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Erro ao enviar os dados: $e")));
+      print("Erro ao enviar os dados: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao enviar os dados: $e")),
+      );
     }
   }
 
@@ -79,12 +91,18 @@ class _PostCartaoState extends State<PostCartao> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Informações do Cartão',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.black,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-              "assets/images/wallpaper.png",
-            ), // fundo como mostrado na imagem
+            image: AssetImage("assets/images/wallpaper.png"),
             fit: BoxFit.cover,
           ),
         ),
@@ -122,10 +140,7 @@ class _PostCartaoState extends State<PostCartao> {
                   onPressed: postCartao,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 40,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
