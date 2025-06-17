@@ -1,12 +1,8 @@
-import 'package:babymetal/ingressos.dart';
-import 'package:babymetal/navigation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-TextEditingController _user = TextEditingController();
-TextEditingController _pass = TextEditingController();
+import 'package:firebase_core/firebase_core.dart'; 
+import 'package:babymetal/navigation.dart'; 
+import 'package:babymetal/auth.dart'; 
+import 'firebase_options.dart'; 
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,40 +12,93 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String registedUser = 'isabella';
-  String registedPassword = 'igorbedon';
-  String verificated = '';
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService(); 
 
-  bool logar() {
-    if (_user.text == registedUser && _pass.text == registedPassword) {
-      print('Correct credentials.');
-      return true;
-    } else {
-      print("Iconcorrect credentials.");
+  String _errorMessage = ''; 
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeFirebase();
+  }
+
+
+  Future<void> _initializeFirebase() async {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      print("Erro ao inicializar Firebase: $e");
       setState(() {
-        verificated = 'Incorrect credentials.';
+        _errorMessage = "Erro ao carregar o aplicativo. Tente novamente.";
       });
-      return false;
     }
+  }
+
+  Future<void> _performLogin() async {
+    setState(() {
+      _errorMessage = ''; 
+    });
+
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() {
+        _errorMessage = "Por favor, preencha todos os campos.";
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_errorMessage)),
+      );
+      return;
+    }
+
+    final String? message = await _authService.login(email: email, password: password);
+
+    if (message == "Login bem-sucedido!") {
+      print('Login bem-sucedido!');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const NavApp())); 
+    } else {
+      print("Erro de login: $message");
+      setState(() {
+        _errorMessage = message ?? "Erro desconhecido ao logar.";
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_errorMessage)),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Login", style: TextStyle(color: Colors.white)),
-        iconTheme: IconThemeData(color: Colors.white),
+        title: const Text("Login", style: TextStyle(color: Colors.white, fontFamily: "poppins")),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/images/wallpaper.png"),
             fit: BoxFit.cover,
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -57,8 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
               Column(
                 children: [
                   Image.asset("assets/images/logo.png", width: double.infinity),
-                  SizedBox(height: 20),
-                  Text(
+                  const SizedBox(height: 20),
+                  const Text(
                     "NO BRASIL",
                     style: TextStyle(
                       fontFamily: "poppins",
@@ -73,55 +122,93 @@ class _LoginScreenState extends State<LoginScreen> {
               Column(
                 children: [
                   TextField(
-                    decoration: InputDecoration(
-                      hintText: "USUARIO",
+                    controller: _emailController, 
+                    decoration: const InputDecoration(
+                      hintText: "EMAIL", 
                       hintStyle: TextStyle(
                         color: Colors.grey,
-                        fontWeight: FontWeight.w900),
+                        fontWeight: FontWeight.w900,
+                      ),
                       border: OutlineInputBorder(),
                     ),
-                    controller: _user,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
+                    keyboardType: TextInputType.emailAddress, 
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
-                    decoration: InputDecoration(
-                      hintText: "SENHA",
+                    controller: _passwordController, 
+                    decoration: const InputDecoration(
+                      hintText: "SENHA", 
                       hintStyle: TextStyle(
                         color: Colors.grey,
-                        fontWeight: FontWeight.w900),
+                        fontWeight: FontWeight.w900,
+                      ),
                       border: OutlineInputBorder(),
                     ),
-                    controller: _pass,
                     obscureText: true,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
+                  if (_errorMessage.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        _errorMessage,
+                        style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                 ],
               ),
               ElevatedButton(
-                onPressed: () {
-                  if (logar()) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => NavApp()),
-                    );
-                  }
-                },
+                onPressed: _performLogin, 
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFE3DFD3),
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 13),
+                  backgroundColor: const Color(0xFFE3DFD3),
+                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 13),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(7),
                   ),
                 ),
-                child: Text("LOGIN",
-                    style: TextStyle(
-                      fontFamily: 'poppins',
-                      fontSize: 25,
-                      color: Color(0xFF310A03),
-                      fontWeight: FontWeight.w900
-                    ),
+                child: const Text(
+                  "LOGIN",
+                  style: TextStyle(
+                    fontFamily: 'poppins',
+                    fontSize: 25,
+                    color: Color(0xFF310A03),
+                    fontWeight: FontWeight.w900,
                   ),
+                ),
+              ),
+
+              TextButton(
+                onPressed: () async {
+                  final String email = _emailController.text.trim();
+                  final String password = _passwordController.text.trim();
+
+                  if (email.isEmpty || password.isEmpty) {
+                    setState(() {
+                      _errorMessage = "Para registrar, preencha email e senha.";
+                    });
+                     ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(_errorMessage)),
+                    );
+                    return;
+                  }
+
+                  final String? message = await _authService.registration(email: email, password: password);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(message ?? "Erro desconhecido ao registrar.")),
+                  );
+                  if (message == "Usuário registrado com sucesso!") {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const NavApp()),
+                    );
+                  }
+                },
+                child: const Text(
+                  "Não tem uma conta? Registre-se aqui.",
+                  style: TextStyle(color: Color(0xFFE3DFD3)),
+                ),
               ),
             ],
           ),

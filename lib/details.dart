@@ -14,7 +14,7 @@ class DetailsIngressoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ingressos", style: TextStyle(color: Colors.white)),
+        title: Text("Ingressos", style: TextStyle(color: Colors.white, fontFamily: "poppins")),
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
       ),
@@ -30,7 +30,7 @@ class DetailsIngressoPage extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment:
-                  MainAxisAlignment.center, // centraliza verticalmente
+                  MainAxisAlignment.center, 
               children: [
                 Container(
                   width: double.infinity,
@@ -41,7 +41,6 @@ class DetailsIngressoPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Imagem do ingresso
                       ClipRRect(
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(10),

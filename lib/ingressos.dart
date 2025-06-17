@@ -70,7 +70,7 @@ class IngressoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ingressos", style: TextStyle(color: Colors.white)),
+        title: Text("Ingressos", style: TextStyle(color: Colors.white, fontFamily: "poppins")),
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
       ),

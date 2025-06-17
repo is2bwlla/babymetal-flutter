@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:babymetal/api.dart';
+import 'package:babymetal/mapa.dart';
 
 class NavApp extends StatefulWidget {
   const NavApp({super.key});
@@ -25,6 +27,8 @@ class _NavAppState extends State<NavApp> {
   static List<Widget> _widgetOptions = <Widget> [    
     IngressoPage(),
     CartaoHistoryScreen(),
+    ConselhosPage(),
+    Mapa()
   ];
 
   void showItemTrap(int index) {
@@ -46,9 +50,16 @@ class _NavAppState extends State<NavApp> {
             label: "Home",
             backgroundColor: Colors.black
           ),
-
           BottomNavigationBarItem(icon: Icon(Icons.history),
             label: "History",
+            backgroundColor: Colors.black
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.message),
+            label: "Conselhos",
+            backgroundColor: Colors.black
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.map),
+            label: "Map",
             backgroundColor: Colors.black
           )
         ],
